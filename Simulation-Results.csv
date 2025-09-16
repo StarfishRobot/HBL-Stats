@@ -1,10 +1,13 @@
-"DataWindow","Home.Team","Away.Team","HomeWins","AwayWins","Ties","Home.Score","Away.Score","Home.Sim.Mean","Away.Sim.Mean"
-5,"SC DHfK Leipzig","HSG Wetzlar",685,278,37,26.477,22.95,26,23
-5,"TBV Lemgo Lippe","VfL Gummersbach",974,15,11,41.552,24.878,42,25
-5,"ThSV Eisenach","MT Melsungen",204,755,41,24.121,29.553,24,29
-10,"SC DHfK Leipzig","HSG Wetzlar",480,463,57,22.329,22.107,22,22
-10,"TBV Lemgo Lippe","VfL Gummersbach",828,137,35,37.666,30.099,38,30
-10,"ThSV Eisenach","MT Melsungen",441,502,57,29.443,30.088,30,30
-15,"SC DHfK Leipzig","HSG Wetzlar",406,537,57,21.954,23.393,22,23
-15,"TBV Lemgo Lippe","VfL Gummersbach",896,87,17,40.45,30.142,41,30
-15,"ThSV Eisenach","MT Melsungen",57,928,15,21.029,31.932,21,32
+"DataWindow","Home.Team","Away.Team","HomeWins","AwayWins","Ties","Home.Score","Away.Score","Home.Sim.Median","Away.Sim.Median"
+2,"Rhein-Neckar Löwen","ThSV Eisenach",773,192,35,30.415,24.441,30,24
+5,"Rhein-Neckar Löwen","ThSV Eisenach",641,324,35,29.153,25.982,29,26
+10,"Rhein-Neckar Löwen","ThSV Eisenach",744,222,34,28.859,23.694,29,24
+15,"Rhein-Neckar Löwen","ThSV Eisenach",686,264,50,29.044,24.987,29,25
+2,"Bergischer HC","GWD Minden",750,202,48,29.484,23.962,30,24
+5,"Bergischer HC","GWD Minden",789,183,28,30.805,24.348,31,24
+10,"Bergischer HC","GWD Minden",769,185,46,30.887,24.408,31,24
+15,"Bergischer HC","GWD Minden",708,254,38,30.78,26.396,31,26
+2,"THW Kiel","Handball Sport Verein Hamburg",377,564,59,27.809,29.865,28,30
+5,"THW Kiel","Handball Sport Verein Hamburg",539,413,48,29.439,28.034,29,28
+10,"THW Kiel","Handball Sport Verein Hamburg",485,466,49,28.192,27.903,28,28
+15,"THW Kiel","Handball Sport Verein Hamburg",528,416,56,27.3,26.036,27,26
