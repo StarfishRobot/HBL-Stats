@@ -1,7 +1,8 @@
-"Date","Home","Away","PredictedHome","PredictedAway","PredictedHomeRF","PredictedAwayRF"
-2025-09-04,"VfL Gummersbach","MT Melsungen",22,26,29,30
-2025-09-04,"SC DHfK Leipzig","TBV Lemgo Lippe",22,25,28,28
-2025-09-04,"SG Flensburg-Handewitt","TVB Stuttgart",27,24,33,28
-2025-09-06,"Füchse Berlin","SC Magdeburg",25,26,31,29
-2025-09-06,"HC Erlangen","FRISCH AUF! Göppingen",23,25,28,27
-2025-09-07,"Handball Sport Verein Hamburg","Rhein-Neckar Löwen",24,27,29,29
+"Date","Home","Away","PredictedHome","PredictedAway","PredictedHomeRF","PredictedAwayRF","JustELO.Home","JustELO.Away"
+2026-04-25,"THW Kiel","SC DHfK Leipzig",34,26,35,29,32,29
+2026-04-25,"HC Erlangen","Handball Sport Verein Hamburg",31,31,30,29,30,33
+2026-04-26,"HSG Wetzlar","Bergischer HC",29,31,29,31,30,28
+2026-04-26,"TSV Hannover-Burgdorf","TBV Lemgo Lippe",30,31,31,30,31,29
+2026-04-26,"TVB Stuttgart","SC Magdeburg",27,34,26,32,29,33
+2026-04-30,"VfL Gummersbach","FRISCH AUF! Göppingen",34,28,33,28,33,28
+2026-05-01,"Rhein-Neckar Löwen","MT Melsungen",30,31,31,30,31,30
