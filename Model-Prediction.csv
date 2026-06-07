@@ -1,9 +1,10 @@
 "Date","Home","Away","PredictedHome","PredictedAway","PredictedHomeRF","PredictedAwayRF","JustELO.Home","JustELO.Away"
-2026-05-29,"HC Erlangen","Bergischer HC",28,29,27,27,26,28
-2026-05-29,"ThSV Eisenach","Füchse Berlin",29,35,28,33,32,33
-2026-06-03,"Rhein-Neckar Löwen","TSV Hannover-Burgdorf",31,30,32,30,30,31
-2026-06-03,"FRISCH AUF! Göppingen","TVB Stuttgart",32,28,30,27,31,27
-2026-06-03,"GWD Minden","THW Kiel",27,33,28,32,28,31
-2026-06-03,"SC Magdeburg","VfL Gummersbach",34,30,32,29,35,30
-2026-06-03,"TBV Lemgo Lippe","SC DHfK Leipzig",33,28,32,29,33,29
-2026-06-04,"Handball Sport Verein Hamburg","HSG Wetzlar",30,28,30,28,29,28
+2026-06-07,"TSV Hannover-Burgdorf","MT Melsungen",29,32,31,31,30,32
+2026-06-07,"Füchse Berlin","SG Flensburg-Handewitt",29,30,33,31,35,35
+2026-06-07,"THW Kiel","TBV Lemgo Lippe",29,30,31,31,31,33
+2026-06-07,"VfL Gummersbach","Rhein-Neckar Löwen",29,27,32,27,30,29
+2026-06-07,"SC DHfK Leipzig","GWD Minden",29,29,29,29,28,28
+2026-06-07,"ThSV Eisenach","Handball Sport Verein Hamburg",29,32,32,31,33,30
+2026-06-07,"HSG Wetzlar","SC Magdeburg",29,34,29,35,29,35
+2026-06-07,"TVB Stuttgart","HC Erlangen",29,28,29,27,29,26
+2026-06-07,"Bergischer HC","FRISCH AUF! Göppingen",29,31,30,31,29,31
