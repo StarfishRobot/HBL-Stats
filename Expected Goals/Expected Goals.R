@@ -150,3 +150,13 @@ Player.Exp.Goals<-Events%>%select(teamName, playerId, season)%>%distinct()%>%fil
   arrange(desc(teamName))%>%
   select(season, teamName, playerName, Shots, Goals, MeanExp, Avg.Dif)
   
+
+
+ShotbyShot<-Events%>%mutate(x=round(40*x/100, 0))%>%
+  mutate(y=round(20*y/100, 0))%>%
+  left_join(ShotZones, by=c("x"="x", "y"="y", "Modifier"="Modifier"))
+ShotbyShot%>%filter(gameID=="3a7d1104-79f3-11f1-a4af-a9813bd3aa40")%>%
+  mutate(AvgRate=(Rate+ZoneRate)/2)%>%
+  select(teamName, playerName, Score, AvgRate)%>%
+  group_by(teamName)%>%
+  summarise(`Goals/Shots`=paste0(sum(Score), "/", n()), ExpGoals=sum(AvgRate))
