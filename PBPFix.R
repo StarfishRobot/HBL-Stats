@@ -1,3 +1,6 @@
+library(dplyr)
+library(tidyr)
+PBP<-data.frame()
 for(i in c(2017:2025)){
   PBP<-PBP%>%bind_rows(read.csv(paste0("https://raw.githubusercontent.com/StarfishRobot/HBL-Stats/refs/heads/main/PlayByPlay/HBL-Box-PBP-DE-",i,".csv")))
 }
@@ -28,4 +31,8 @@ for(i in c(1:nrow(PBP))){
   AwayPlayers<-6-nrow(CurrentSusp%>%filter(Team=="Away"))
   PBP$HomeFieldPlayers[i]<-HomePlayers+PBP$HomeEmpty[i]
   PBP$AwayFieldPlayers[i]<-AwayPlayers+PBP$AwayEmpty[i]
+}
+
+for(i in c(2017:2025)){
+  write.csv(PBP%>%filter(season==i), paste0("D:/OneDrive/Public/HBL-Stats/PlayByPlay/HBL-Box-PBP-DE-",i,".csv"), row.names = F)
 }

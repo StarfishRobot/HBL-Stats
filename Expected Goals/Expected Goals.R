@@ -158,5 +158,5 @@ ShotbyShot<-Events%>%mutate(x=round(40*x/100, 0))%>%
 ShotbyShot%>%filter(gameID=="3a7d1104-79f3-11f1-a4af-a9813bd3aa40")%>%
   mutate(AvgRate=(Rate+ZoneRate)/2)%>%
   select(teamName, playerName, Score, AvgRate)%>%
-  group_by(teamName)%>%
+  group_by(teamName, playerName)%>%
   summarise(`Goals/Shots`=paste0(sum(Score), "/", n()), ExpGoals=sum(AvgRate))
