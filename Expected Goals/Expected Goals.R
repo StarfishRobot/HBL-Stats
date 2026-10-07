@@ -46,6 +46,7 @@ EventMatch<-c('4-Minuten Strafe'='Penalty',
 
 
 PBP<-PBP%>%mutate(Event=recode(eventText, !!!EventMatch))
+PBP$TeamSide<-ifelse(PBP$teamName==PBP$homeTeam, "Home", "Away")
 
 #Determine man up/shorthand situations
 PBP$Modifier<-ifelse(PBP$teamName==PBP$homeTeam, 
@@ -56,11 +57,11 @@ PBP$Modifier<-ifelse(PBP$teamName==PBP$homeTeam,
 
 
 #filter only for shooting events
-Events<-PBP%>%filter(Event=="Goal" | Event=="Miss")
+PBP<-PBP%>%filter(Event=="Goal" | Event=="Miss")
 
-Events<-Events%>%filter(eventText!="Tor" & eventText!="Fehlwurf")
+PBP<-PBP%>%filter(eventText!="Tor" & eventText!="Fehlwurf")
 
-Rates<-Events%>%
+Rates<-PBP%>%
   select(Event, eventSubType, Modifier)%>%
   group_by(eventSubType, Modifier, Event)%>%
   summarise(n=n())%>%
@@ -68,10 +69,10 @@ Rates<-Events%>%
   mutate(Rate=Goal/(Goal+Miss))%>%select(eventSubType, Modifier, Rate)
 
 
-Events<-Events%>%left_join(Rates, by=c("eventSubType"="eventSubType", "Modifier"="Modifier"))
-Events$Score<-ifelse(Events$Event=="Goal", 1, 0)
+PBP<-PBP%>%left_join(Rates, by=c("eventSubType"="eventSubType", "Modifier"="Modifier"))
+PBP$Score<-ifelse(PBP$Event=="Goal", 1, 0)
 
-Basic.Exp<-Events%>%#filter(season==2025)%>%
+Basic.Exp<-PBP%>%#filter(season==2025)%>%
   select(season, playerId, Rate, Score)%>%
   group_by(season, playerId)%>%
   summarise(Shots = n(),Goals=sum(Score), ExpGoals=sum(Rate))%>%
@@ -81,7 +82,7 @@ Basic.Exp<-Events%>%#filter(season==2025)%>%
   arrange(desc(ExGlperShot))#%>%
   #left_join(PBP%>%filter(playerName!="")%>%select(playerName, playerId)%>%distinct())
 
-
+Events<-PBP%>%filter(season>=2024)
 Events$y<-ifelse(Events$x<50, 100-Events$y, Events$y)
 Events$x<-ifelse(Events$x<50, 100-Events$x, Events$x)
 Events$x<-ifelse(grepl("eigenen Hälfte", Events$eventText),
@@ -90,73 +91,114 @@ Events$x<-ifelse(grepl("eigenen Hälfte", Events$eventText),
 Location<-Events%>%filter(!is.na(x))%>%filter(season>=2024)
 Location$x<-40*(Location$x/100)
 Location$y<-20*(Location$y/100)
-fig<-plot_ly()
-fig<-fig%>%add_trace(x=Location$x, y=Location$y,type = 'scatter',mode = 'markers', text=Location$eventText)
-fig
+# fig<-plot_ly()
+# fig<-fig%>%add_trace(x=Location$x, y=Location$y,type = 'scatter',mode = 'markers', text=Location$eventText)
+# fig
 ShotZones<-data.frame()
 for(t in Location%>%pull(Modifier)%>%unique()){
   for(i in c(0:40)){
     for(w in c(0:20)){
       Zone<-Location%>%filter(Modifier==t & x>=i & x<i+1 & y>=w & y<w+1)
-      ZoneRate<-ifelse(Zone%>%nrow()<=10, 0, Zone%>%filter(Event=="Goal")%>%nrow()/Zone%>%nrow())
+      ZoneGoals<-Zone%>%filter(Event=="Goal")%>%nrow()
+      ZoneShots<-Zone%>%nrow()
+      ZoneRate<-ifelse(ZoneShots<=5, 0, ZoneGoals/ZoneShots)
       
-      ShotZones<-ShotZones%>%bind_rows(data.frame(x=i, y=w, Modifier=t, ZoneRate=ZoneRate, Shots=Zone%>%nrow()))
+      ShotZones<-ShotZones%>%bind_rows(data.frame(x=i, y=w, Modifier=t, ZoneRate=ZoneRate, Shots=ZoneShots, Goals=ZoneGoals))
     }
   }
 }
 
-Exact.Exp<-Events%>%filter(season>=2024)%>%
-  select(season, playerId,eventSubType, Rate, Score, x, y, Modifier)%>%
+Exact.Exp<-Events%>%
+  #select(season, game,eventSubType, Rate, Score, x, y, Modifier)%>%
   mutate(x=round(40*x/100, 0))%>%
   mutate(y=round(20*y/100, 0))%>%
   left_join(ShotZones, by=c("x"="x", "y"="y", "Modifier"="Modifier"))%>%
-  group_by(season, playerId)%>%
+  group_by(gameID,teamName)%>%
   filter(!is.na(ZoneRate))%>%
   summarise(Shots = n(),Goals=sum(Score), ExpGoals=sum(ZoneRate))%>%
   mutate(Dif=Goals/ExpGoals, GoalRate=Goals/Shots)%>%
-  mutate(ExGlperShot=ExpGoals/Shots)%>%
+  # mutate(ExGlperShot=ExpGoals/Shots)%>%
   filter(Shots>10)%>%
   arrange(desc(Dif))#%>%
   #left_join(PBP%>%filter(playerName!="")%>%select(playerName, playerId)%>%distinct())
 
-Team.Exp.Goals<-Events%>%select(teamName, playerId, season)%>%distinct()%>%filter(season==2026)%>%
-  left_join(Basic.Exp%>%select(playerId, Shots, Goals, ExpGoals, Dif))%>%
-  left_join(Exact.Exp%>%select(season, playerId, ExpGoals, Dif)%>%
-              rename(Exact.Exp=ExpGoals, 
-                     Exact.Dif=Dif),
-            by=c("playerId"="playerId", "season"="season"))%>%
-  filter(!is.na(Shots) & season>=2024 & !is.na(Exact.Exp))%>%
-  mutate(MeanExp=(ExpGoals+Exact.Exp)/2)%>%
-  mutate(Avg.Dif=Goals/MeanExp)%>%
-  select(season, teamName, Shots, Goals, MeanExp, Avg.Dif)%>%
-  #mutate(Exp.Dif=abs(Dif-Exact.Dif))%>%
-  group_by(teamName)%>%
-  summarise(Shots = sum(Shots),Goals=sum(Goals), ExpGoals=sum(MeanExp))%>%
-mutate(Avg.Dif=Goals/ExpGoals)%>%
-  arrange(desc(Avg.Dif))
-  # select(season, teamName, playerName, Shots, Goals, MeanExp, Avg.Dif)
 
-Player.Exp.Goals<-Events%>%select(teamName, playerId, season)%>%distinct()%>%filter(season>=2024)%>%
-  left_join(Basic.Exp%>%select(playerId, Shots, Goals, ExpGoals, Dif))%>%
-  left_join(Exact.Exp%>%select(season, playerId, ExpGoals, Dif)%>%
-              rename(Exact.Exp=ExpGoals, 
-                     Exact.Dif=Dif),
-            by=c("playerId"="playerId", "season"="season"))%>%
-  filter(!is.na(Shots) & season>=2024 & !is.na(Exact.Exp))%>%
-  mutate(MeanExp=(ExpGoals+Exact.Exp)/2)%>%
-  mutate(Avg.Dif=Goals/MeanExp)%>%
-  #mutate(Exp.Dif=abs(Dif-Exact.Dif))%>%
-  left_join(PlayerRoster)%>%
-  arrange(desc(teamName))%>%
-  select(season, teamName, playerName, Shots, Goals, MeanExp, Avg.Dif)
-  
+GameExpGoals<-PBP%>%
+  select(gameID, teamName, TeamSide, Score, Rate)%>%
+  group_by(gameID, teamName, TeamSide)%>%
+  summarise(Shots = n(),Goals=sum(Score), Basic.ExpGoals=sum(Rate))%>%
+  left_join(Exact.Exp%>%select(gameID, teamName, ExpGoals), 
+            by=c("gameID"="gameID", "teamName"="teamName"))%>%
+  group_by(gameID, teamName, TeamSide)%>%
+  mutate(Expected.Goals=mean(c(Basic.ExpGoals, ExpGoals), na.rm=T))%>%
+  mutate(Dif=Goals/Expected.Goals)
+# 
+# 
+# Team.Exp.Goals<-Events%>%select(teamName, playerId, season)%>%distinct()%>%filter(season>=2024)%>%
+#   left_join(Basic.Exp%>%select(playerId, Shots, Goals, ExpGoals, Dif))%>%
+#   left_join(Exact.Exp%>%select(season, playerId, ExpGoals, Dif)%>%
+#               rename(Exact.Exp=ExpGoals, 
+#                      Exact.Dif=Dif),
+#             by=c("playerId"="playerId", "season"="season"))%>%
+#   filter(!is.na(Shots) & season>=2024 & !is.na(Exact.Exp))%>%
+#   mutate(MeanExp=(ExpGoals+Exact.Exp)/2)%>%
+#   mutate(Avg.Dif=Goals/MeanExp)%>%
+#   select(season, teamName, Shots, Goals, MeanExp, Avg.Dif)%>%
+#   #mutate(Exp.Dif=abs(Dif-Exact.Dif))%>%
+#   group_by(teamName)%>%
+#   summarise(Shots = sum(Shots),Goals=sum(Goals), ExpGoals=sum(MeanExp))%>%
+# mutate(Avg.Dif=Goals/ExpGoals)%>%
+#   arrange(desc(Avg.Dif))
+#   # select(season, teamName, playerName, Shots, Goals, MeanExp, Avg.Dif)
+# 
+# Player.Exp.Goals<-Events%>%select(teamName, playerId, season)%>%distinct()%>%#filter(season>=2024)%>%
+#   left_join(Basic.Exp%>%select(playerId, Shots, Goals, ExpGoals, Dif))%>%
+#   left_join(Exact.Exp%>%select(season, playerId, ExpGoals, Dif)%>%
+#               rename(Exact.Exp=ExpGoals, 
+#                      Exact.Dif=Dif),
+#             by=c("playerId"="playerId", "season"="season"))%>%
+#   filter(!is.na(Shots) & season>=2024 & !is.na(Exact.Exp))%>%
+#   mutate(MeanExp=(ExpGoals+Exact.Exp)/2)%>%
+#   mutate(Avg.Dif=Goals/MeanExp)%>%
+#   #mutate(Exp.Dif=abs(Dif-Exact.Dif))%>%
+#   left_join(PlayerRoster)%>%
+#   arrange(desc(teamName))%>%
+#   select(season, teamName, playerName, Shots, Goals, MeanExp, Avg.Dif)
+#   
+# 
+# 
+# ShotbyShot<-Events%>%#filter(season==2026)%>%
+#   mutate(x=round(40*x/100, 0))%>%
+#   mutate(y=round(20*y/100, 0))%>%
+#   left_join(ShotZones, by=c("x"="x", "y"="y", "Modifier"="Modifier"))%>%
+#   mutate(AvgRate=(Rate+ZoneRate)/2)%>%
+#   arrange(desc(as.Date(gameDate)))%>%
+#   filter(row_number()<=5)%>%
+#   group_by(gameID, gameDate,teamName)%>%
+# 
+#   summarise(ExpGoals=sum(AvgRate), Goals=sum(Score), Shots = n())%>%
+#   mutate(Rate=Goals/ExpGoals)
 
-
-ShotbyShot<-Events%>%mutate(x=round(40*x/100, 0))%>%
-  mutate(y=round(20*y/100, 0))%>%
-  left_join(ShotZones, by=c("x"="x", "y"="y", "Modifier"="Modifier"))
-ShotbyShot%>%filter(gameID=="3a7d1104-79f3-11f1-a4af-a9813bd3aa40")%>%
-  mutate(AvgRate=(Rate+ZoneRate)/2)%>%
-  select(teamName, playerName, Score, AvgRate)%>%
-  group_by(teamName, playerName)%>%
-  summarise(`Goals/Shots`=paste0(sum(Score), "/", n()), ExpGoals=sum(AvgRate))
+# ShotbyShot%>%filter(gameID=="3a7d1104-79f3-11f1-a4af-a9813bd3aa40")%>%
+#   # mutate(AvgRate=(Rate+ZoneRate)/2)%>%
+#   # select(teamName, playerName, Score, AvgRate)%>%
+#   group_by(teamName, playerName)%>%
+#   summarise(`Goals/Shots`=paste0(sum(Goals), "/", sum(Shots)), ExpGoals=ExpGoals)
+# 
+# 
+# ELO<-read_sheet("1DJyTtMb1F89J0dcP3GVmRDuyVe4kbhvxmL8HJET4cC8", sheet = "Sheet2", range="A:L")%>%
+#   filter(!is.na(`Pred Margin`))%>%
+#   rename("Home.Score"=`Home Score`, 
+#          "Away.Score"=`Away Score`,
+#          "Pred.Margin" = `Pred Margin`,
+#          "Home.Win.."= `Home Win %`,
+#          "Away.Win.." = `Away Win %`,
+#          "Home.ELO" = `Home ELO`,
+#          "Away.ELO" = `Away ELO`)
+# 
+# ShotbyShot<-ShotbyShot%>%
+#   left_join(ELO%>%select(GameId, Home, Away, Home.ELO, Away.ELO), by=c("gameID"="GameId"))
+# 
+# ShotbyShot$Opp.Elo<-ifelse(ShotbyShot$teamName==ShotbyShot$Home, ShotbyShot$Away.ELO, ShotbyShot$Home.ELO)
+# ShotbyShot$Elo.Diff<-ifelse(ShotbyShot$teamName==ShotbyShot$Home, ShotbyShot$Home.ELO-ShotbyShot$Opp.Elo, ShotbyShot$Away.ELO-ShotbyShot$Opp.Elo)
+# 

@@ -9,7 +9,7 @@ library(googlesheets4)
 
 #get PBP data
 PBP<-data.frame()
-for(i in c(2025:2025)){
+for(i in c(2017:2025)){
   PBP<-PBP%>%bind_rows(read.csv(paste0("https://raw.githubusercontent.com/StarfishRobot/HBL-Stats/refs/heads/main/PlayByPlay/HBL-Box-PBP-DE-",i,".csv")))
 }
 PlayerRoster<-PBP%>%select(playerId, playerName)%>%
@@ -76,7 +76,7 @@ PBP%>%select(season,
              AwayFieldPlayers,
              Event, 
              HomeGoale, 
-             AwayGoalie)%>%
+             AwayGoalie)%>%filter(season==2025)%>%
   filter(Event%in%c("Goal", "Miss"))%>%
   mutate(Players=ifelse(teamName==homeTeam, 
                         paste0(HomeFieldPlayers, "v", AwayFieldPlayers),
@@ -84,9 +84,10 @@ PBP%>%select(season,
   mutate(GoalStatus=ifelse(teamName==homeTeam, HomeGoale, AwayGoalie))%>%
   mutate(Score=ifelse(Event=="Goal", 1, 0))%>%
   select(season, teamName, Score, Players, GoalStatus)%>%
-  group_by(Players, GoalStatus)%>%
-  summarise(Rate=sum(Score)/n(), Count=n())%>%
-  filter(Count>10)
-
-
-
+  filter((Players=="6v6"))%>%
+  group_by(season,teamName, Players, GoalStatus)%>%
+  summarise(Scoring.Rate=sum(Score)/n(), Play.Count=n())%>%
+  filter(Play.Count>5)%>%
+  arrange(desc(Players))%>%select(-Play.Count)%>%
+  mutate(Scoring.Rate=scales::percent(Scoring.Rate, accuracy = .1))%>%
+  pivot_wider(names_from = GoalStatus, values_from = Scoring.Rate)
