@@ -1,8 +1,8 @@
-"Date","Home","Away","PredictedHome","PredictedAway","PredictedHomeRF","PredictedAwayRF","JustELO.Home","JustELO.Away"
-2026-10-08,"Rhein-Neckar Löwen","ThSV Eisenach",30,28,30,27,29,27
-2026-10-08,"TVB Stuttgart","HSG Wetzlar",30,30,29,29,30,31
-2026-10-09,"TSV Hannover-Burgdorf","SG Flensburg-Handewitt",30,32,30,32,29,35
-2026-10-10,"FRISCH AUF! Göppingen","SG BBM Bietigheim",30,27,31,28,30,27
-2026-10-11,"THW Kiel","Handball Club Hamburg",31,29,30,27,29,32
-2026-10-11,"HC Erlangen","MT Melsungen",29,31,30,30,29,30
-2026-10-11,"Füchse Berlin","TBV Lemgo Lippe",34,30,33,29,35,32
+"Date","Home","Away","PredictedHome","PredictedAway","PredictedHomeRF","PredictedAwayRF","JustELO.Home","JustELO.Away","Spread"
+2026-10-10,"FRISCH AUF! Göppingen","SG BBM Bietigheim",30,28,30,28,30,27,2.33333333333333
+2026-10-11,"THW Kiel","Handball Club Hamburg",31,28,32,28,29,32,1.33333333333333
+2026-10-11,"HC Erlangen","MT Melsungen",29,31,30,30,29,30,-1
+2026-10-11,"Füchse Berlin","TBV Lemgo Lippe",35,29,33,29,35,32,4.33333333333333
+2026-10-16,"ThSV Eisenach","VfL Gummersbach",NA,NA,NA,NA,27,33,NA
+2026-10-18,"SC Magdeburg","TVB Stuttgart",NA,NA,NA,NA,35,29,NA
+2026-10-19,"HBW Balingen-Weilstetten","TSV Hannover-Burgdorf",NA,NA,NA,NA,27,30,NA
