@@ -76,7 +76,7 @@ PBP%>%select(season,
              AwayFieldPlayers,
              Event, 
              HomeGoale, 
-             AwayGoalie)%>%filter(season==2025)%>%
+             AwayGoalie)%>%#filter(season==2025)%>%
   filter(Event%in%c("Goal", "Miss"))%>%
   mutate(Players=ifelse(teamName==homeTeam, 
                         paste0(HomeFieldPlayers, "v", AwayFieldPlayers),
@@ -84,10 +84,11 @@ PBP%>%select(season,
   mutate(GoalStatus=ifelse(teamName==homeTeam, HomeGoale, AwayGoalie))%>%
   mutate(Score=ifelse(Event=="Goal", 1, 0))%>%
   select(season, teamName, Score, Players, GoalStatus)%>%
-  filter((Players=="6v6"))%>%
-  group_by(season,teamName, Players, GoalStatus)%>%
+  #filter((Players=="7v6"))%>%
+  group_by(Players, GoalStatus)%>%
   summarise(Scoring.Rate=sum(Score)/n(), Play.Count=n())%>%
-  filter(Play.Count>5)%>%
-  arrange(desc(Players))%>%select(-Play.Count)%>%
+  filter(Play.Count>50)%>%
+  select(-Play.Count)%>%
   mutate(Scoring.Rate=scales::percent(Scoring.Rate, accuracy = .1))%>%
-  pivot_wider(names_from = GoalStatus, values_from = Scoring.Rate)
+  pivot_wider(names_from = GoalStatus, values_from = Scoring.Rate)%>%arrange(desc(Players))
+
